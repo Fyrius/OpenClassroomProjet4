@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,17 +37,17 @@ public class ParkingServiceTest {
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 
-            ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
-            Ticket ticket = new Ticket();
-            ticket.setInTime(new Date(System.currentTimeMillis() - (60*60*1000)));
-            ticket.setParkingSpot(parkingSpot);
-            ticket.setVehicleRegNumber("ABCDEF");
-            when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
-            when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
+            ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false); //Create a temp parking spot
+            Ticket ticket = new Ticket(); //Create a temp ticket
+            ticket.setInTime(new Date(System.currentTimeMillis() - (60*60*1000))); //def the time limit of the ticket
+            ticket.setParkingSpot(parkingSpot); //def "parkingSpot" of the ticket
+            ticket.setVehicleRegNumber("ABCDEF"); //def the number of the vehicle
 
-            when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
+            when(ticketDAO.getTicket(anyString())).thenReturn(ticket); //return the temp ticker when any "getTicket" is called
+            when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true); //return true when an update of any ticket is make
+            when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true); //return true whan an update of any parcking slot is update
 
-            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO); //Def parkingService (locate: here)
         } catch (Exception e) {
             e.printStackTrace();
             throw  new RuntimeException("Failed to set up test mock objects");
@@ -54,8 +56,9 @@ public class ParkingServiceTest {
 
     @Test
     public void processExitingVehicleTest(){
-        parkingService.processExitingVehicle();
+        parkingService.processExitingVehicle(); //process to the exiciting of the vehicle to the parking slot define in the "setUpPerTest" method
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+
     }
 
 }
